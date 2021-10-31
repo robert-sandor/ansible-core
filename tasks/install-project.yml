@@ -12,5 +12,9 @@
 - name: Setup prometheus config
   ansible.builtin.import_tasks: ../tasks/prometheus/configure.yml
 
+- name: Create docker network {{ common.network.name }}
+  community.docker.docker_network:
+    name: "{{ network_name }}"
+
 - name: Start docker images
   ansible.builtin.import_tasks: ../tasks/docker-compose-up.yml

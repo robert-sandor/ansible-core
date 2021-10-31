@@ -192,6 +192,8 @@ services:
 {% endif %}
 networks:
   {{ network_name }}:
+    external: 
+      name: {{ network_name }}
 
 volumes:
   {{ acme_volume }}:
