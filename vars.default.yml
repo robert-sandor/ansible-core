@@ -106,3 +106,11 @@ grafana_name: grafana
 grafana_image: grafana/grafana
 grafana_volume: "{{ grafana_name }}-data"
 grafana_admin_password: grafana
+grafana_plugins: grafana-piechart-panel
+
+# speedtest exporter
+ste_enable: yes
+ste_name: speedtest-exporter
+ste_version: latest
+ste_image: ghcr.io/miguelndecarvalho/speedtest-exporter
+ste_port: 9798

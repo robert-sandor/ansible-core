@@ -157,6 +157,7 @@ services:
       - PGID={{ ansible_facts.user_gid }}
       - TZ={{ timezone }}
       - GF_SECURITY_ADMIN_PASSWORD={{ grafana_admin_password }}
+      - GF_INSTALL_PLUGINS={{ grafana_plugins }}
     networks:
       - {{ network_name }}
     expose:
@@ -175,6 +176,20 @@ services:
       - flame.url={{ grafana_name }}.{{ domain }}
       - flame.icon=gauge
 
+{% if ste_enable %}
+  {{ ste_name }}:
+    container_name: {{ ste_name }}
+    hostname: {{ ste_name }}
+    image: {{ ste_image }}:{{ ste_version }}
+    restart: {{ restart_policy }}
+    environment:
+      - SPEEDTEST_PORT={{ ste_port }}
+    networks:
+      - {{ network_name }}
+    expose:
+      - {{ ste_port }}
+    
+{% endif %}
 networks:
   {{ network_name }}:
 

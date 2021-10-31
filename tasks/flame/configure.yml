@@ -47,6 +47,7 @@
 - name: Save flame app ids
   ansible.builtin.set_fact:
     present_flame_apps: "{{ _response.json.data }}"
+  when: flame_apps_clean
 
 - name: Remove flame app
   ansible.builtin.uri:

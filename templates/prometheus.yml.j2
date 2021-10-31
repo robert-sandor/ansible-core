@@ -1,11 +1,18 @@
 global:
   scrape_interval: {{ prom_scrape_interval }}
+  scrape_timeout: {{ prom_scrape_timeout }}
   external_labels:
     monitor: {{ project_name }}
 
 scrape_configs:
 {% for e in prom_jobs %}
   - job_name: {{ e.name }}
+{% if e.scrape_interval is defined %}
+    scrape_interval: {{ e.scrape_interval }}
+{% endif %}
+{% if e.scrape_timeout is defined %}
+    scrape_timeout: {{ e.scrape_timeout }}
+{% endif %}
     static_configs:
       - targets:
 {% for t in e.hosts %}
