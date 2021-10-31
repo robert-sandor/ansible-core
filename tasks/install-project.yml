@@ -10,7 +10,7 @@
     - "{{ config_dir | expanduser }}"
 
 - name: Setup prometheus config
-  ansible.builtin.import_tasks: ../tasks/configure-prometheus.yml
+  ansible.builtin.import_tasks: ../tasks/prometheus/configure.yml
 
 - name: Start docker images
   ansible.builtin.import_tasks: ../tasks/docker-compose-up.yml

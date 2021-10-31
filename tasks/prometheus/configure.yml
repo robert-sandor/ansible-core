@@ -1,6 +1,6 @@
 - name: Copy prometheus config
-  ansible.builtin.copy:
-    src: ../files/prometheus.yml
+  ansible.builtin.template:
+    src: ../templates/prometheus.yml.j2
     dest: "{{ config_dir }}/prometheus.yml"
     owner: "{{ ansible_facts.user_id }}"
     group: "{{ ansible_facts.user_id }}"

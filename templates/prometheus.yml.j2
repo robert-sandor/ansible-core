@@ -1,0 +1,14 @@
+global:
+  scrape_interval: {{ prom_scrape_interval }}
+  external_labels:
+    monitor: {{ project_name }}
+
+scrape_configs:
+{% for e in prom_jobs %}
+  - job_name: {{ e.name }}
+    static_configs:
+      - targets:
+{% for t in e.hosts %}
+        - '{{ t }}'
+{% endfor %}
+{% endfor %}

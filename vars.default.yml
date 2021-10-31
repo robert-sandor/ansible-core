@@ -84,6 +84,12 @@ prom_name: prometheus
 prom_image: prom/prometheus
 prom_volume: "{{ prom_name }}-data"
 
+prom_scrape_interval: 1m
+prom_jobs:
+  - name: self
+    hosts: 
+      - localhost:9090
+
 # Prometheus Node Exporter
 prom_node_exp_version: latest
 prom_node_exp_name: node-exporter 
