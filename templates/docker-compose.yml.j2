@@ -18,6 +18,9 @@ services:
       - "--certificatesresolvers.{{ acme_provider }}.acme.dnschallenge.provider={{ acme_provider }}"
       - "--certificatesresolvers.{{ acme_provider }}.acme.email={{ acme_email }}"
       - "--certificatesresolvers.{{ acme_provider }}.acme.storage=/letsencrypt/acme.json"
+      - "--metrics.prometheus={{ traefik_enable_metrics | ternary('true', 'false') }}"
+      - "--entryPoints.metrics.address=:{{ traefik_metrics_port }}"
+      - "--metrics.prometheus.entryPoint=metrics"
     environment:
       - PUID={{ ansible_facts.user_uid }}
       - PGID={{ ansible_facts.user_gid }}
@@ -32,6 +35,9 @@ services:
       - 443:443
     expose:
       - 8080
+{% if traefik_enable_metrics %}
+      - {{ traefik_metrics_port }}
+{% endif %}
     volumes:
       - {{ acme_volume }}:/letsencrypt
       - /var/run/docker.sock:/var/run/docker.sock:ro
