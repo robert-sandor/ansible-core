@@ -1,0 +1,22 @@
+- name: Copy prometheus config
+  ansible.builtin.copy:
+    src: ../files/prometheus.yml
+    dest: "{{ config_dir }}/prometheus.yml"
+    owner: "{{ ansible_facts.user_id }}"
+    group: "{{ ansible_facts.user_id }}"
+    mode: '0644'
+  register: prom_config_file_result
+
+- name: Get info on prometheus container
+  community.docker.docker_container_info:
+    name: "{{ prom_name }}"
+  register: prom_container_info
+  when: prom_config_file_result.changed
+
+- name: Restart prometheus
+  community.docker.docker_compose:
+    project_name: "{{ project_name }}"
+    project_src: "{{ project_dir }}"
+    services: "{{ prom_name }}"
+    restarted: yes
+  when: prom_config_file_result.changed and prom_container_info.exists

@@ -1,0 +1,27 @@
+---
+- name: Install core home server services
+  
+  hosts: all
+  
+  gather_facts: yes
+
+  vars_files:
+    - ../vars.default.yml
+    - ../vars.yml
+
+  tasks:
+    - name: Update system
+      ansible.builtin.import_tasks: ../tasks/update-system.yml
+      when: update_system
+
+    - name: Update containers
+      ansible.builtin.import_tasks: ../tasks/docker-compose-up.yml
+
+    - name: Update portiner config
+      ansible.builtin.import_tasks: ../tasks/portainer/configure.yml
+
+    - name: Update prometheus config
+      ansible.builtin.import_tasks: ../tasks/prometheus/configure.yml
+
+    - name: Update flame config
+      ansible.builtin.import_tasks: ../tasks/flame/configure.yml

@@ -1,0 +1,97 @@
+timezone: Europe/Bucharest
+
+# project vars
+project_name: "coresvc"
+project_dir: "~/{{ project_name }}"
+config_dir: "{{ project_dir }}/config"
+restart_policy: unless-stopped
+network_name: coresvc-net
+domain: example.com
+
+# Updates
+update_system: no
+restart_system: no
+update_containers: yes
+docker_prune: yes
+
+# Traefik
+traefik_version: v2.5
+traefik_name: traefik
+traefik_image: traefik
+acme_email: email@example.com
+acme_provider: cloudflare
+acme_volume: acme-data
+acme_env:
+  CF_API_EMAIL: email@example.com
+  CF_DNS_API_TOKEN: <cloudflare_token>
+
+# Portainer
+portainer_version: latest
+portainer_name: portainer
+portainer_image: portainer/portainer-ce
+portainer_volume: "{{ portainer_name }}-data"
+portainer_user: admin
+portainer_password: portainer
+
+# Flame
+flame_version: latest
+flame_name: flame
+flame_image: pawelmalak/flame
+flame_volume: "{{ flame_name }}-data"
+
+# Visit https://www.weatherapi.com/pricing.aspx to get the API key
+# if blank, weather API is disabled
+flame_config_WEATHER_API_KEY: ""
+# Visit https://www.latlong.net/convert-address-to-lat-long.html to get lat/long
+flame_config_lat: 0
+flame_config_long: 0
+flame_config_isCelsius: true
+flame_config_customTitle: "{{ domain }}"
+flame_config_pinAppsByDefault: true
+flame_config_pinCategoriesByDefault: true
+flame_config_hideHeader: false
+flame_config_useOrdering: name
+flame_config_appsSameTab: false
+flame_config_bookmarksSameTab: false
+flame_config_searchSameTab: false
+flame_config_hideApps: false
+flame_config_hideCategories: true
+flame_config_hideSearch: true
+flame_config_defaultSearchProvider: d
+flame_config_dockerApps: true
+flame_config_dockerHost: localhost
+flame_config_kubernetesApps: false
+flame_config_unpinStoppedApps: false
+flame_config_useAmericanDate: false
+flame_config_disableAutofocus: false
+flame_config_basePath: /
+
+# flame comes with some preconfigured apps by default
+# recommend setting this to yes for install, or whenever you want to remove apps
+flame_apps_clean: no
+# for icons check https://materialdesignicons.com/
+flame_apps:
+  - name: sonarr
+    url: "sonarr.example.com"
+    icon: television
+  - name: radarr
+    url: "radarr.example.com"
+    icon: movie
+
+# Prometheus
+prom_version: latest
+prom_name: prometheus
+prom_image: prom/prometheus
+prom_volume: "{{ prom_name }}-data"
+
+# Prometheus Node Exporter
+prom_node_exp_version: latest
+prom_node_exp_name: node-exporter 
+prom_node_exp_image: prom/node-exporter
+
+# Grafana
+grafana_version: latest
+grafana_name: grafana
+grafana_image: grafana/grafana
+grafana_volume: "{{ grafana_name }}-data"
+grafana_admin_password: grafana

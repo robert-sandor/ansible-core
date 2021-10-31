@@ -1,0 +1,77 @@
+- name: Configure flame
+  ansible.builtin.uri:
+    url: "https://{{ flame_name }}.{{ domain }}/api/config"
+    method: PUT
+    body_format: json
+    body:
+      WEATHER_API_KEY: "{{ flame_config_WEATHER_API_KEY }}"
+      lat: "{{ flame_config_lat }}"
+      long: "{{ flame_config_long }}"
+      isCelsius: "{{ flame_config_isCelsius }}"
+      customTitle: "{{ flame_config_customTitle }}"
+      pinAppsByDefault: "{{ flame_config_pinAppsByDefault }}"
+      pinCategoriesByDefault: "{{ flame_config_pinCategoriesByDefault }}"
+      hideHeader: "{{ flame_config_hideHeader }}"
+      useOrdering: "{{ flame_config_useOrdering }}"
+      appsSameTab: "{{ flame_config_appsSameTab }}"
+      bookmarksSameTab: "{{ flame_config_bookmarksSameTab }}"
+      searchSameTab: "{{ flame_config_searchSameTab }}"
+      hideApps: "{{ flame_config_hideApps }}"
+      hideCategories: "{{ flame_config_hideCategories }}"
+      hideSearch: "{{ flame_config_hideSearch }}"
+      defaultSearchProvider: "{{ flame_config_defaultSearchProvider }}"
+      dockerApps: "{{ flame_config_dockerApps }}"
+      dockerHost: "{{ flame_config_dockerHost }}"
+      kubernetesApps: "{{ flame_config_kubernetesApps }}"
+      unpinStoppedApps: "{{ flame_config_unpinStoppedApps }}"
+      useAmericanDate: "{{ flame_config_useAmericanDate }}"
+      disableAutofocus: "{{ flame_config_disableAutofocus }}"
+      basePath: "{{ flame_config_basePath }}"
+    status_code: 200
+  register: _response
+  retries: 10
+  delay: 10
+  until: _response.status != -1 or _response.status == 404
+
+- name: Get flame apps
+  ansible.builtin.uri:
+    url: "https://{{ flame_name }}.{{ domain }}/api/apps"
+    method: GET
+    status_code: 200
+  register: _response
+  retries: 10
+  delay: 10
+  until: _response.status != -1 or _response.status == 404
+  when: flame_apps_clean
+
+- name: Save flame app ids
+  ansible.builtin.set_fact:
+    present_flame_apps: "{{ _response.json.data }}"
+
+- name: Remove flame app
+  ansible.builtin.uri:
+    url: "https://{{ flame_name }}.{{ domain }}/api/apps/{{ item.id }}"
+    method: DELETE
+    status_code: 200
+  register: _response
+  retries: 10
+  delay: 10
+  until: _response.status != -1 or _response.status == 404
+  with_items: "{{ present_flame_apps }}"
+  when: flame_apps_clean
+
+- name: Create app
+  ansible.builtin.uri:
+    url: "https://{{ flame_name }}.{{ domain }}/api/apps"
+    method: POST
+    body_format: json
+    body:
+      name: "{{ item.name }}"
+      url: "{{ item.url }}"
+      icon: "{{ item.icon }}"
+    status_code: 201
+  register: _response
+  retries: 10
+  delay: 10
+  with_items: "{{ flame_apps }}"
+  until: _response.status != -1 or _response.status == 404

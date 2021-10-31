@@ -1,0 +1,180 @@
+version: "3.8"
+
+services:
+
+  {{ traefik_name }}:
+    container_name: {{ traefik_name }}
+    hostname: {{ traefik_name }}
+    image: traefik:{{ traefik_version }}
+    command:
+      - "--api=true"
+      - "--providers.docker=true"
+      - "--providers.docker.network={{ network_name }}"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.{{ acme_provider }}.acme.dnschallenge=true"
+      - "--certificatesresolvers.{{ acme_provider }}.acme.dnschallenge.provider={{ acme_provider }}"
+      - "--certificatesresolvers.{{ acme_provider }}.acme.email={{ acme_email }}"
+      - "--certificatesresolvers.{{ acme_provider }}.acme.storage=/letsencrypt/acme.json"
+    environment:
+      - PUID={{ ansible_facts.user_uid }}
+      - PGID={{ ansible_facts.user_gid }}
+      - TZ={{ timezone }}
+{% for e in acme_env %}
+      - {{ e }}={{ acme_env[e] }}
+{% endfor %}
+    networks:
+      - {{ network_name }}
+    ports:
+      - 80:80
+      - 443:443
+    expose:
+      - 8080
+    volumes:
+      - {{ acme_volume }}:/letsencrypt
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.traefik.rule=Host(`{{ traefik_name }}.{{ domain }}`)
+      - traefik.http.routers.traefik.entrypoints=websecure
+      - traefik.http.routers.traefik.service=api@internal
+      - traefik.http.routers.traefik.tls.certresolver={{ acme_provider }}
+      - flame.type=application
+      - flame.name={{ traefik_name }}
+      - flame.url={{ traefik_name }}.{{ domain }}
+      - flame.icon=traffic-light
+    restart: {{ restart_policy }}
+
+  # Portainer - GUI to control docker stuff
+  {{ portainer_name }}:
+    container_name: {{ portainer_name }}
+    hostname: {{ portainer_name }}
+    image: {{ portainer_image }}:{{ portainer_version }}
+    restart: {{ restart_policy }}
+    environment:
+      - PUID={{ ansible_facts.user_uid }}
+      - PGID={{ ansible_facts.user_gid }}
+      - TZ={{ timezone }}
+    networks:
+      - {{ network_name }}
+    expose:
+      - 9000
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - {{ portainer_volume }}:/data
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.{{ portainer_name }}.rule=Host(`{{ portainer_name }}.{{ domain }}`)
+      - traefik.http.routers.{{ portainer_name }}.entrypoints=websecure
+      - traefik.http.services.{{ portainer_name }}.loadbalancer.server.port=9000
+      - traefik.http.routers.{{ portainer_name }}.service={{ portainer_name }}
+      - traefik.http.routers.{{ portainer_name }}.tls.certresolver={{ acme_provider }}
+      - flame.type=application
+      - flame.name={{ portainer_name }}
+      - flame.url={{ portainer_name }}.{{ domain }}
+      - flame.icon=docker
+
+  # Flame Application Dashboard
+  {{ flame_name }}:
+    container_name: {{ flame_name }}
+    hostname: {{ flame_name }}
+    image: {{ flame_image }}:{{ flame_version }}
+    environment:
+      - PUID={{ ansible_facts.user_uid }}
+      - PGID={{ ansible_facts.user_gid }}
+      - TZ={{ timezone }}
+    volumes:    
+      - {{ flame_volume }}:/app/data
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - {{ network_name }}
+    expose:
+      - 5005
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.{{ flame_name }}.rule=Host(`{{ flame_name }}.{{ domain }}`) || Host(`{{ domain }}`)
+      - traefik.http.routers.{{ flame_name }}.entrypoints=websecure
+      - traefik.http.services.{{ flame_name }}.loadbalancer.server.port=5005
+      - traefik.http.routers.{{ flame_name }}.service={{ flame_name }}
+      - traefik.http.routers.{{ flame_name }}.tls.certresolver={{ acme_provider }}
+
+  # Prometheus for gathering metrics
+  {{ prom_name }}:
+    container_name: {{ prom_name }}
+    hostname: {{ prom_name }}
+    image: {{ prom_image }}:{{ prom_version }}
+    restart: {{ restart_policy }}
+    environment:
+      - PUID={{ ansible_facts.user_uid }}
+      - PGID={{ ansible_facts.user_gid }}
+      - TZ={{ timezone }}
+    networks:
+      - {{ network_name }}
+    expose:
+      - 9090
+    volumes:
+      - {{ config_dir }}/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - {{ prom_volume }}:/prometheus
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.{{ prom_name }}.rule=Host(`{{ prom_name }}.{{ domain }}`)
+      - traefik.http.routers.{{ prom_name }}.entrypoints=websecure
+      - traefik.http.services.{{ prom_name }}.loadbalancer.server.port=9090
+      - traefik.http.routers.{{ prom_name }}.service={{ prom_name }}
+      - traefik.http.routers.{{ prom_name }}.tls.certresolver={{ acme_provider }}
+      - flame.type=application
+      - flame.name={{ prom_name }}
+      - flame.url={{ prom_name }}.{{ domain }}
+      - flame.icon=fire
+
+  {{ prom_node_exp_name }}:
+    container_name: {{ prom_node_exp_name }}
+    hostname: {{ prom_node_exp_name }}
+    image: {{ prom_node_exp_image }}:{{ prom_node_exp_version }}
+    command:
+      - '--path.rootfs=/host'
+    network_mode: host
+    pid: host
+    volumes:
+      - '/:/host:ro,rslave'
+    restart: {{ restart_policy }}
+
+  {{ grafana_name }}:
+    container_name: {{ grafana_name }}
+    hostname: {{ grafana_name }}
+    image: {{ grafana_image }}:{{ grafana_version }}
+    restart: {{ restart_policy }}
+    environment:
+      - PUID={{ ansible_facts.user_uid }}
+      - PGID={{ ansible_facts.user_gid }}
+      - TZ={{ timezone }}
+      - GF_SECURITY_ADMIN_PASSWORD={{ grafana_admin_password }}
+    networks:
+      - {{ network_name }}
+    expose:
+      - 3000
+    volumes:
+      - {{ grafana_volume }}:/var/lib/grafana
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.{{ grafana_name }}.rule=Host(`{{ grafana_name }}.{{ domain }}`)
+      - traefik.http.routers.{{ grafana_name }}.entrypoints=websecure
+      - traefik.http.services.{{ grafana_name }}.loadbalancer.server.port=3000
+      - traefik.http.routers.{{ grafana_name }}.service={{ grafana_name }}
+      - traefik.http.routers.{{ grafana_name }}.tls.certresolver={{ acme_provider }}
+      - flame.type=application
+      - flame.name={{ grafana_name }}
+      - flame.url={{ grafana_name }}.{{ domain }}
+      - flame.icon=gauge
+
+networks:
+  {{ network_name }}:
+
+volumes:
+  {{ acme_volume }}:
+  {{ portainer_volume }}:
+  {{ flame_volume }}:
+  {{ prom_volume }}:
+  {{ grafana_volume }}:

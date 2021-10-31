@@ -1,0 +1,16 @@
+- name: Create project folder structure
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ ansible_facts.user_id }}"
+    group: "{{ ansible_facts.user_id }}"
+    mode: '0755'
+  with_items:
+    - "{{ project_dir | expanduser }}"
+    - "{{ config_dir | expanduser }}"
+
+- name: Setup prometheus config
+  ansible.builtin.import_tasks: ../tasks/configure-prometheus.yml
+
+- name: Start docker images
+  ansible.builtin.import_tasks: ../tasks/docker-compose-up.yml

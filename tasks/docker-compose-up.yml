@@ -1,0 +1,27 @@
+- name: Template docker compose file
+  ansible.builtin.template:
+    src: ../templates/docker-compose.yml.j2
+    dest: "{{ project_dir }}/docker-compose.yml"
+    owner: "{{ ansible_facts.user_id }}"
+    group: "{{ ansible_facts.user_id }}"
+    mode: '0644'
+  when: update_containers
+
+- name: Start services
+  community.docker.docker_compose:
+    project_name: "{{ project_name }}"
+    project_src: "{{ project_dir }}"
+    pull: yes
+    remove_orphans: yes
+  when: update_containers
+
+- name: Prune everything
+  community.docker.docker_prune:
+    containers: yes
+    images: yes
+    images_filters:
+      dangling: no
+    networks: yes
+    volumes: yes
+    builder_cache: yes
+  when: docker_prune
