@@ -42,12 +42,10 @@
   retries: 10
   delay: 10
   until: _response.status != -1 or _response.status == 404
-  when: flame_apps_clean
 
 - name: Save flame app ids
   ansible.builtin.set_fact:
     present_flame_apps: "{{ _response.json.data }}"
-  when: flame_apps_clean
 
 - name: Remove flame app
   ansible.builtin.uri:
@@ -61,18 +59,9 @@
   with_items: "{{ present_flame_apps }}"
   when: flame_apps_clean
 
-- name: Create app
-  ansible.builtin.uri:
-    url: "https://{{ flame_name }}.{{ domain }}/api/apps"
-    method: POST
-    body_format: json
-    body:
-      name: "{{ item.name }}"
-      url: "{{ item.url }}"
-      icon: "{{ item.icon }}"
-    status_code: 201
-  register: _response
-  retries: 10
-  delay: 10
+- name: Add apps
+  ansible.builtin.include_tasks: ../tasks/flame/add-app.yml
+  vars:
+    existing_apps: "{{ present_flame_apps }}"
+    app: "{{ item }}"
   with_items: "{{ flame_apps }}"
-  until: _response.status != -1 or _response.status == 404
