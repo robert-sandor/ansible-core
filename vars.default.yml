@@ -34,6 +34,7 @@ portainer_image: portainer/portainer-ce
 portainer_volume: "{{ portainer_name }}-data"
 portainer_user: admin
 portainer_password: portainer
+portainer_enable_dark_theme: yes
 
 # Flame
 flame_version: latest

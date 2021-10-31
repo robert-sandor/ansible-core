@@ -20,8 +20,61 @@
     body:
       username: "{{ portainer_user }}"
       password: "{{ portainer_password }}"
+    status_code: 200
   register: _response
   retries: 10
   delay: 10
   until: _response.status != -1
   when: not portainer_admin_exists
+
+- name: Authenticate with admin credentials
+  ansible.builtin.uri:
+    url: "https://{{ portainer_name }}.{{ domain }}/api/auth"
+    method: POST
+    body_format: json
+    body:
+      username: "{{ portainer_user }}"
+      password: "{{ portainer_password }}"
+    status_code: 200
+  register: _response
+  retries: 10
+  delay: 10
+  until: _response.status != -1
+
+- name: Get Portainer JWT token
+  ansible.builtin.set_fact:
+    portainer_token: "{{ _response.json.jwt }}"
+
+- name: Get Users
+  ansible.builtin.uri:
+    url: "https://{{ portainer_name }}.{{ domain }}/api/users"
+    method: GET
+    headers:
+      Authorization: "Bearer {{ portainer_token }}"
+    status_code: 200
+  register: _response
+  retries: 10
+  delay: 10
+  until: _response.status != -1
+
+- name: Get Portainer Admin User ID
+  ansible.builtin.set_fact:
+    admin_users: "{{ _response.json | json_query(admin_user_query) }}"
+  vars:
+    admin_user_query: "[?Username == `{{ portainer_user }}`]"
+
+- name: Set dark mode for admin user
+  ansible.builtin.uri:
+    url: "https://{{ portainer_name }}.{{ domain }}/api/users/{{ item.Id }}"
+    method: PUT
+    body_format: json
+    body:
+      userTheme: dark
+      register: _response
+    headers:
+      Authorization: "Bearer {{ portainer_token }}"
+    status_code: 200
+  retries: 10
+  delay: 10
+  until: _response.status != -1
+  with_items: "{{ admin_users }}"
