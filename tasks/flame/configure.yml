@@ -33,6 +33,10 @@
   delay: 10
   until: _response.status != -1 or _response.status == 404
 
+- name: Cleanup apps
+  ansible.builtin.import_tasks: ../tasks/flame/cleanup-apps.yml
+  when: flame_apps_clean
+
 - name: Get flame apps
   ansible.builtin.uri:
     url: "https://{{ flame_name }}.{{ domain }}/api/apps"
@@ -46,18 +50,6 @@
 - name: Save flame app ids
   ansible.builtin.set_fact:
     present_flame_apps: "{{ _response.json.data }}"
-
-- name: Remove flame app
-  ansible.builtin.uri:
-    url: "https://{{ flame_name }}.{{ domain }}/api/apps/{{ item.id }}"
-    method: DELETE
-    status_code: 200
-  register: _response
-  retries: 10
-  delay: 10
-  until: _response.status != -1 or _response.status == 404
-  with_items: "{{ present_flame_apps }}"
-  when: flame_apps_clean
 
 - name: Add apps
   ansible.builtin.include_tasks: ../tasks/flame/add-app.yml
