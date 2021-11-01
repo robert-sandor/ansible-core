@@ -12,6 +12,16 @@
 - name: Setup prometheus config
   ansible.builtin.import_tasks: ../tasks/prometheus/configure.yml
 
+- name: Create docker volumes
+  community.docker.docker_volume:
+    name: "{{ item }}"
+  with_items:
+    - "{{ acme_volume }}"
+    - "{{ portainer_volume }}"
+    - "{{ flame_volume }}"
+    - "{{ prom_volume }}"
+    - "{{ grafana_volume }}"
+
 - name: Create docker network {{ common.network.name }}
   community.docker.docker_network:
     name: "{{ network_name }}"

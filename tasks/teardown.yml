@@ -1,0 +1,28 @@
+- name: Get info on docker host and list containers
+  community.docker.docker_host_info:
+    containers: yes
+  register: _response
+  when: teardown_containers
+
+- name: Remove container
+  community.docker.docker_container:
+    name: "{{ item.Id }}"
+    state: absent
+  with_items: "{{ _response.containers }}"
+  when: teardown_containers
+
+- name: Prune images, networks and volumes
+  community.docker.docker_prune:
+    images: yes
+    images_filters:
+      dangling: no
+    networks: "{{ teardown_networks }}"
+    volumes: "{{ teardown_volumes }}"
+    builder_cache: yes
+  when: docker_prune
+
+- name: Remove project dir
+  ansible.builtin.file:
+    path: "{{ project_dir }}"
+    state: absent
+  when: teardown_project_dir

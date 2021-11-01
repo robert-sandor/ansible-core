@@ -14,6 +14,12 @@ restart_system: no
 update_containers: yes
 docker_prune: yes
 
+# Teardown
+teardown_containers: yes
+teardown_networks: yes
+teardown_volumes: no
+teardown_project_dir: yes
+
 # Traefik
 traefik_version: v2.5
 traefik_name: traefik
@@ -105,7 +111,7 @@ prom_node_exp_image: prom/node-exporter
 # Grafana
 grafana_version: latest
 grafana_name: grafana
-grafana_image: grafana/grafana
+grafana_image: grafana/grafana-oss
 grafana_volume: "{{ grafana_name }}-data"
 grafana_admin_password: grafana
 grafana_plugins: grafana-piechart-panel
