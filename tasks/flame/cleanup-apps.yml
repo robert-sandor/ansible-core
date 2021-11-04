@@ -3,6 +3,7 @@
     url: "https://{{ flame_name }}.{{ domain }}/api/apps"
     method: GET
     status_code: 200
+    validate_certs: "{{ validate_certificates }}"
   register: _response
   retries: 10
   delay: 10
@@ -17,6 +18,7 @@
     url: "https://{{ flame_name }}.{{ domain }}/api/apps/{{ item.id }}"
     method: DELETE
     status_code: 200
+    validate_certs: "{{ validate_certificates }}"
   register: _response
   retries: 10
   delay: 10

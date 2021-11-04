@@ -28,6 +28,7 @@
       disableAutofocus: "{{ flame_config_disableAutofocus }}"
       basePath: "{{ flame_config_basePath }}"
     status_code: 200
+    validate_certs: "{{ validate_certificates }}"
   register: _response
   retries: 10
   delay: 10
@@ -42,6 +43,7 @@
     url: "https://{{ flame_name }}.{{ domain }}/api/apps"
     method: GET
     status_code: 200
+    validate_certs: "{{ validate_certificates }}"
   register: _response
   retries: 10
   delay: 10

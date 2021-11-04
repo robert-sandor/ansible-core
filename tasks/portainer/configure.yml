@@ -3,6 +3,7 @@
     url: "https://{{ portainer_name }}.{{ domain }}/api/users/admin/check"
     method: GET
     status_code: [ 204, 404 ]
+    validate_certs: "{{ validate_certificates }}"
   register: _response
   retries: 10
   delay: 10
@@ -21,6 +22,7 @@
       username: "{{ portainer_user }}"
       password: "{{ portainer_password }}"
     status_code: 200
+    validate_certs: "{{ validate_certificates }}"
   register: _response
   retries: 10
   delay: 10
@@ -36,6 +38,7 @@
       username: "{{ portainer_user }}"
       password: "{{ portainer_password }}"
     status_code: 200
+    validate_certs: "{{ validate_certificates }}"
   register: _response
   retries: 10
   delay: 10
@@ -52,6 +55,7 @@
     headers:
       Authorization: "Bearer {{ portainer_token }}"
     status_code: 200
+    validate_certs: "{{ validate_certificates }}"
   register: _response
   retries: 10
   delay: 10
@@ -74,6 +78,7 @@
     headers:
       Authorization: "Bearer {{ portainer_token }}"
     status_code: 200
+    validate_certs: "{{ validate_certificates }}"
   retries: 10
   delay: 10
   until: _response.status != -1

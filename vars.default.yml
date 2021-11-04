@@ -7,6 +7,7 @@ config_dir: "{{ project_dir }}/config"
 restart_policy: unless-stopped
 network_name: coresvc-net
 domain: example.com
+validate_certificates: "{{ not acme_testing_mode }}"
 
 # Updates
 update_system: no
@@ -29,6 +30,7 @@ traefik_metrics_port: 8082
 acme_email: email@example.com
 acme_provider: cloudflare
 acme_volume: acme-data
+acme_testing_mode: yes
 acme_env:
   CF_API_EMAIL: email@example.com
   CF_DNS_API_TOKEN: <cloudflare_token>
