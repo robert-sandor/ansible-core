@@ -8,6 +8,7 @@ services:
     image: traefik:{{ traefik_version }}
     command:
       - "--api=true"
+      - "--accesslog={{ traefik_enable_access_logs | ternary('true', 'false') }}"
       - "--providers.docker=true"
       - "--providers.docker.network={{ network_name }}"
       - "--providers.docker.exposedbydefault=false"
