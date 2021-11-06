@@ -1,14 +1,8 @@
-- name: Get info on docker host and list containers
-  community.docker.docker_host_info:
-    containers: yes
-  register: _response
-  when: teardown_containers
-
-- name: Remove container
-  community.docker.docker_container:
-    name: "{{ item.Id }}"
+- name: Stop services
+  community.docker.docker_compose:
+    project_name: "{{ project_name }}"
+    project_src: "{{ project_dir }}"
     state: absent
-  with_items: "{{ _response.containers }}"
   when: teardown_containers
 
 - name: Prune images, networks and volumes
