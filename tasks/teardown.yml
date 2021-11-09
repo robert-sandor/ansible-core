@@ -13,7 +13,6 @@
     networks: "{{ teardown_networks }}"
     volumes: "{{ teardown_volumes }}"
     builder_cache: yes
-  when: docker_prune
 
 - name: Remove project dir
   ansible.builtin.file:
