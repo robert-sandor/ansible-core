@@ -1,4 +1,4 @@
-timezone: Europe/Bucharest
+timezone: Etc/UTC
 
 # project vars
 project_name: "coresvc"
