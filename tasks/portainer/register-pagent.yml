@@ -1,0 +1,38 @@
+- name: Get existing endpoints
+  ansible.builtin.uri:
+    url: "https://{{ portainer_name }}.{{ domain }}/api/endpoints"
+    method: GET
+    headers:
+      Authorization: "Bearer {{ portainer_token }}"
+    status_code: 200
+    validate_certs: "{{ validate_certificates }}"
+  register: _response
+  retries: 10
+  delay: 10
+  until: _response.status != -1
+
+- name: Check existing agent with same host
+  ansible.builtin.set_fact:
+    already_exists: "{{ _response.json | json_query(query) | length() > 0 }}"
+  vars:
+    query: "[?contains(URL,'{{ pagent_host }}')].Id"
+
+- name: Register Portainer Agent
+  ansible.builtin.uri:
+    url: "https://{{ portainer_name }}.{{ domain }}/api/endpoints"
+    method: POST
+    body_format: form-urlencoded
+    body: 
+      Name: "{{ pagent_name }}"
+      EndpointCreationType: "2"
+      URL: "tcp://{{ pagent_host }}:9001"
+      TLS: "true"
+      TLSSkipVerify: "true"
+      TLSSkipClientVerify: "true"
+    headers:
+      Authorization: "{{ auth_header }}"
+  register: _response
+  retries: 10
+  delay: 10
+  until: _response.status != -1
+  when: not already_exists

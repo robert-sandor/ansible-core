@@ -74,12 +74,20 @@
     body_format: json
     body:
       userTheme: dark
-      register: _response
     headers:
       Authorization: "Bearer {{ portainer_token }}"
     status_code: 200
     validate_certs: "{{ validate_certificates }}"
+  register: _response
   retries: 10
   delay: 10
   until: _response.status != -1
   with_items: "{{ admin_users }}"
+
+- name: Register Portainer Agent {{ item.name }}
+  ansible.builtin.include_tasks: ../tasks/portainer/register-pagent.yml
+  vars:
+    auth_header: "Bearer {{ portainer_token }}"
+    pagent_name: "{{ item.name }}"
+    pagent_host: "{{ item.host }}"
+  with_items: "{{ portainer_agents }}"
