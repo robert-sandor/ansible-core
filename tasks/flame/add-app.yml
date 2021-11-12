@@ -7,7 +7,7 @@
 
 - name: Create app
   ansible.builtin.uri:
-    url: "https://{{ flame_name }}.{{ domain }}/api/apps"
+    url: "https://{{ domain }}/api/apps"
     method: POST
     body_format: json
     body:
@@ -24,7 +24,7 @@
 
 - name: Update existing app
   ansible.builtin.uri:
-    url: "https://{{ flame_name }}.{{ domain }}/api/apps/{{ i.id }}"
+    url: "https://{{ domain }}/api/apps/{{ i.id }}"
     method: PUT
     body_format: json
     body:

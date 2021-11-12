@@ -1,6 +1,6 @@
 - name: Configure flame
   ansible.builtin.uri:
-    url: "https://{{ flame_name }}.{{ domain }}/api/config"
+    url: "https://{{ domain }}/api/config"
     method: PUT
     body_format: json
     body:
@@ -40,7 +40,7 @@
 
 - name: Get flame apps
   ansible.builtin.uri:
-    url: "https://{{ flame_name }}.{{ domain }}/api/apps"
+    url: "https://{{ domain }}/api/apps"
     method: GET
     status_code: 200
     validate_certs: "{{ validate_certificates }}"

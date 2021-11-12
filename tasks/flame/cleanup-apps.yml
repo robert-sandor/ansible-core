@@ -1,6 +1,6 @@
 - name: Get flame apps
   ansible.builtin.uri:
-    url: "https://{{ flame_name }}.{{ domain }}/api/apps"
+    url: "https://{{ domain }}/api/apps"
     method: GET
     status_code: 200
     validate_certs: "{{ validate_certificates }}"
@@ -15,7 +15,7 @@
 
 - name: Remove flame app
   ansible.builtin.uri:
-    url: "https://{{ flame_name }}.{{ domain }}/api/apps/{{ item.id }}"
+    url: "https://{{ domain }}/api/apps/{{ item.id }}"
     method: DELETE
     status_code: 200
     validate_certs: "{{ validate_certificates }}"
