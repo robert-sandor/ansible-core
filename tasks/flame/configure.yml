@@ -1,3 +1,22 @@
+- name: Authenticate with flame
+  ansible.builtin.uri:
+    url: "https://{{ domain }}/api/auth"
+    method: POST
+    body_format: json
+    body:
+      duration: 14d
+      password: "{{ flame_password }}"
+    status_code: 200
+    validate_certs: "{{ validate_certificates }}"
+  register: _response
+  retries: 10
+  delay: 10
+  until: _response.status != -1 or _response.status == 404
+
+- name: Save flame token
+  ansible.builtin.set_fact:
+    flame_token: "{{ _response.json.data.token }}"
+
 - name: Configure flame
   ansible.builtin.uri:
     url: "https://{{ domain }}/api/config"
@@ -27,6 +46,8 @@
       useAmericanDate: "{{ flame_config_useAmericanDate }}"
       disableAutofocus: "{{ flame_config_disableAutofocus }}"
       basePath: "{{ flame_config_basePath }}"
+    headers:
+      Authorization: "Bearer {{ flame_token }}"
     status_code: 200
     validate_certs: "{{ validate_certificates }}"
   register: _response

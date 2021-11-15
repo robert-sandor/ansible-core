@@ -55,6 +55,7 @@ flame_version: latest
 flame_name: flame
 flame_image: pawelmalak/flame
 flame_volume: "{{ flame_name }}-data"
+flame_password: flame_password
 
 # Visit https://www.weatherapi.com/pricing.aspx to get the API key
 # if blank, weather API is disabled
