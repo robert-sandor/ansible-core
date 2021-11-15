@@ -6,7 +6,7 @@
     group: "{{ ansible_facts.user_id }}"
     mode: '0644'
   register: _result
-  when: update_containers
+  when: update_compose_file
 
 - name: Start services
   community.docker.docker_compose:
@@ -14,7 +14,7 @@
     project_src: "{{ project_dir }}"
     pull: yes
     remove_orphans: yes
-  when: update_containers and _result.changed
+  when: update_containers or update_compose_file and _result.changed
 
 - name: Prune everything
   community.docker.docker_prune:

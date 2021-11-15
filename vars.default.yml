@@ -12,6 +12,7 @@ validate_certificates: "{{ not acme_testing_mode }}"
 # Updates
 update_system: no
 restart_system: no
+update_compose_file: yes
 update_containers: yes
 docker_prune: yes
 
