@@ -47,7 +47,7 @@
       disableAutofocus: "{{ flame_config_disableAutofocus }}"
       basePath: "{{ flame_config_basePath }}"
     headers:
-      Authorization: "Bearer {{ flame_token }}"
+      authorization-flame: "Bearer {{ flame_token }}"
     status_code: 200
     validate_certs: "{{ validate_certificates }}"
   register: _response

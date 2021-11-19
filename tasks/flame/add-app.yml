@@ -17,7 +17,7 @@
     status_code: 201
     validate_certs: "{{ validate_certificates }}"
     headers:
-      Authorization: "Bearer {{ flame_token }}"
+      authorization-flame: "Bearer {{ flame_token }}"
   register: _response
   retries: 10
   delay: 10
@@ -40,7 +40,7 @@
     status_code: 200
     validate_certs: "{{ validate_certificates }}"
     headers:
-      Authorization: "Bearer {{ flame_token }}"
+      authorization-flame: "Bearer {{ flame_token }}"
   register: _response
   retries: 10
   delay: 10
@@ -57,7 +57,7 @@
     status_code: 200
     validate_certs: "{{ validate_certificates }}"
     headers:
-      Authorization: "Bearer {{ flame_token }}"
+      authorization-flame: "Bearer {{ flame_token }}"
   register: _response
   retries: 10
   delay: 10
