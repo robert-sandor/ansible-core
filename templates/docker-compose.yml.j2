@@ -89,6 +89,7 @@ services:
     container_name: {{ flame_name }}
     hostname: {{ flame_name }}
     image: {{ flame_image }}:{{ flame_version }}
+    restart: {{ restart_policy }}
     environment:
       - PUID={{ ansible_facts.user_uid }}
       - PGID={{ ansible_facts.user_gid }}
