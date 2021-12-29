@@ -131,3 +131,14 @@ ste_name: speedtest-exporter
 ste_version: latest
 ste_image: ghcr.io/miguelndecarvalho/speedtest-exporter
 ste_port: 9798
+
+# watchtower - to monitor for updated docker images
+wt_enable: yes
+wt_name: watchtower
+wt_version: latest
+wt_image: containrrr/watchtower
+wt_cron_schedule: "0 0 1 * * *"
+wt_discord_enable: no
+wt_discord_hook_url: https://discord.com/api/webhooks/.../.../slack
+wt_discord_indentifier: watchtower-{{project_name}}
+wt_monitor_only: yes
