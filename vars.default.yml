@@ -29,6 +29,7 @@ traefik_image: traefik
 traefik_enable_metrics: yes
 traefik_enable_access_logs: false
 traefik_metrics_port: 8081
+traefik_autoupdate: no
 acme_email: email@example.com
 acme_provider: cloudflare
 acme_volume: acme-data
@@ -45,6 +46,7 @@ portainer_volume: "{{ portainer_name }}-data"
 portainer_user: admin
 portainer_password: portainer
 portainer_enable_dark_theme: yes
+portainer_autoupdate: no
 
 portainer_agents:
   - name: example
@@ -56,6 +58,7 @@ flame_name: flame
 flame_image: pawelmalak/flame
 flame_volume: "{{ flame_name }}-data"
 flame_password: flame_password
+flame_autoupdate: no
 
 # Visit https://www.weatherapi.com/pricing.aspx to get the API key
 # if blank, weather API is disabled
@@ -101,6 +104,7 @@ prom_version: latest
 prom_name: prometheus
 prom_image: prom/prometheus
 prom_volume: "{{ prom_name }}-data"
+prom_autoupdate: no
 
 prom_scrape_interval: 1m
 prom_scrape_timeout: 30s
@@ -116,6 +120,7 @@ prom_jobs:
 prom_node_exp_version: latest
 prom_node_exp_name: node-exporter 
 prom_node_exp_image: prom/node-exporter
+prom_node_exp_autoupdate: no
 
 # Grafana
 grafana_version: latest
@@ -124,6 +129,7 @@ grafana_image: grafana/grafana-oss
 grafana_volume: "{{ grafana_name }}-data"
 grafana_admin_password: grafana
 grafana_plugins: grafana-piechart-panel
+grafana_autoupdate: no
 
 # speedtest exporter
 ste_enable: yes
@@ -131,6 +137,7 @@ ste_name: speedtest-exporter
 ste_version: latest
 ste_image: ghcr.io/miguelndecarvalho/speedtest-exporter
 ste_port: 9798
+ste_autoupdate: no
 
 # watchtower - to monitor for updated docker images
 wt_enable: yes
@@ -141,4 +148,6 @@ wt_cron_schedule: "0 0 1 * * *"
 wt_discord_enable: no
 wt_discord_hook_url: https://discord.com/api/webhooks/.../.../slack
 wt_discord_indentifier: watchtower-{{project_name}}
-wt_monitor_only: yes
+wt_monitor_only: no
+wt_update_label_only: yes
+wt_autoupdate: no

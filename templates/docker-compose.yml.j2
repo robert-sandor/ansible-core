@@ -53,6 +53,7 @@ services:
       - flame.name={{ traefik_name }}
       - flame.url={{ traefik_name }}.{{ domain }}
       - flame.icon=traffic-light
+      - com.centurylinklabs.watchtower.enable={{ traefik_autoupdate | ternary('true', 'false')}}
     restart: {{ restart_policy }}
 
   # Portainer - GUI to control docker stuff
@@ -83,6 +84,7 @@ services:
       - flame.name={{ portainer_name }}
       - flame.url={{ portainer_name }}.{{ domain }}
       - flame.icon=docker
+      - com.centurylinklabs.watchtower.enable={{ portainer_autoupdate | ternary('true', 'false')}}
 
   # Flame Application Dashboard
   {{ flame_name }}:
@@ -109,6 +111,7 @@ services:
       - traefik.http.services.{{ flame_name }}.loadbalancer.server.port=5005
       - traefik.http.routers.{{ flame_name }}.service={{ flame_name }}
       - traefik.http.routers.{{ flame_name }}.tls.certresolver={{ acme_provider }}
+      - com.centurylinklabs.watchtower.enable={{ flame_autoupdate | ternary('true', 'false')}}
 
   # Prometheus for gathering metrics
   {{ prom_name }}:
@@ -138,6 +141,7 @@ services:
       - flame.name={{ prom_name }}
       - flame.url={{ prom_name }}.{{ domain }}
       - flame.icon=fire
+      - com.centurylinklabs.watchtower.enable={{ prom_autoupdate | ternary('true', 'false')}}
 
   {{ prom_node_exp_name }}:
     container_name: {{ prom_node_exp_name }}
@@ -150,6 +154,8 @@ services:
     volumes:
       - '/:/host:ro,rslave'
     restart: {{ restart_policy }}
+    labels:
+      - com.centurylinklabs.watchtower.enable={{ prom_node_exp_autoupdate | ternary('true', 'false')}}
 
   {{ grafana_name }}:
     container_name: {{ grafana_name }}
@@ -179,6 +185,7 @@ services:
       - flame.name={{ grafana_name }}
       - flame.url={{ grafana_name }}.{{ domain }}
       - flame.icon=gauge
+      - com.centurylinklabs.watchtower.enable={{ grafana_autoupdate | ternary('true', 'false')}}
 
 {% if ste_enable %}
   {{ ste_name }}:
@@ -192,6 +199,8 @@ services:
       - {{ network_name }}
     expose:
       - {{ ste_port }}
+    labels:
+      - com.centurylinklabs.watchtower.enable={{ ste_autoupdate | ternary('true', 'false')}}
     
 {% endif %}
 {% if wt_enable %}
@@ -205,6 +214,9 @@ services:
 {% if wt_monitor_only %}
       - "--monitor-only"
 {% endif %}
+{% if wt_update_label_only %}
+      - "--label-enable"
+{% endif %}
 {% if wt_discord_enable %}
       - "--notifications=slack"
       - "--notification-slack-hook-url={{ wt_discord_hook_url }}"
@@ -216,6 +228,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - {{ network_name }}
+    labels:
+      - com.centurylinklabs.watchtower.enable={{ wt_autoupdate | ternary('true', 'false')}}
     
 {% endif %}
 networks:
