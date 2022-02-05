@@ -217,6 +217,9 @@ services:
 {% if wt_update_label_only %}
       - "--label-enable"
 {% endif %}
+{% if wt_discord_skip_startup_message %}
+      - "--no-startup-message"
+{% endif %}
 {% if wt_discord_enable %}
       - "--notifications=slack"
       - "--notification-slack-hook-url={{ wt_discord_hook_url }}"
